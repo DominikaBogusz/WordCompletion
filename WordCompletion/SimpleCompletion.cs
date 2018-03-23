@@ -7,34 +7,38 @@ namespace WordCompletion
 {
     public class SimpleCompletion : IComplementarable
     {
-        public Dictionary<string, int> WordsDictionary { get; private set; }
+        private Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
         
         public SimpleCompletion()
         {
-            WordsDictionary = new Dictionary<string, int>();
         }
 
         public SimpleCompletion(Dictionary<string, int> initialDictionary)
         {
-            WordsDictionary = initialDictionary;
+            wordsDictionary = initialDictionary;
         }
 
-        public void Insert(string word)
+        public void Insert(string word, int usesCount = 1)
         {
-            if (WordsDictionary.ContainsKey(word))
+            if (wordsDictionary.ContainsKey(word))
             {
-                WordsDictionary[word] += 1;
+                wordsDictionary[word] += usesCount;
             }
             else
             {
-                WordsDictionary.Add(word, 1);
+                wordsDictionary.Add(word, usesCount);
             }
+        }
+
+        public Dictionary<string, int> GetAllWords()
+        {
+            return wordsDictionary;
         }
 
         public Dictionary<string, int> FindMatches(string prefix)
         {
             Dictionary<string, int> matches = new Dictionary<string, int>();
-            foreach(var word in WordsDictionary)
+            foreach(var word in wordsDictionary)
             {
                 if (word.Key.StartsWith(prefix))
                 {

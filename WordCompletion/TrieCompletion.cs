@@ -17,16 +17,18 @@ namespace WordCompletion
         {
             foreach(var word in initialDictionary)
             {
-                for (int i = 0; i < word.Value; i++)
-                {
-                    trie.Insert(word.Key);
-                }
+                trie.Insert(word.Key, word.Value);
             }
         }
 
-        public void Insert(string word)
+        public void Insert(string word, int usesCount = 1)
         {
-            trie.Insert(word);
+            trie.Insert(word, usesCount);
+        }
+
+        public Dictionary<string, int> GetAllWords()
+        {
+            return trie.FindMatches("");
         }
 
         public Dictionary<string, int> FindMatches(string prefix)

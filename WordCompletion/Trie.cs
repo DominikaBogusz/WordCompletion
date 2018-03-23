@@ -13,7 +13,7 @@ namespace WordCompletion
             root = new TrieNode(' ');
         }
 
-        public void Insert(string word)
+        public void Insert(string word, int usesCount = 1)
         {
             if (!Search(word))
             {
@@ -36,7 +36,7 @@ namespace WordCompletion
                     }
                 }
                 current.IsEnd = true;
-                current.SearchCount++;
+                current.SearchCount += usesCount;
             }
         }
 
