@@ -8,15 +8,6 @@ namespace WordCompletion
     public class SimpleCompletion : IComplementarable
     {
         private Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
-        
-        public SimpleCompletion()
-        {
-        }
-
-        public SimpleCompletion(Dictionary<string, int> initialDictionary)
-        {
-            wordsDictionary = initialDictionary;
-        }
 
         public void Insert(string word, int usesCount = 1)
         {
@@ -28,6 +19,19 @@ namespace WordCompletion
             {
                 wordsDictionary.Add(word, usesCount);
             }
+        }
+
+        public void InsertWordsDictionary(Dictionary<string, int> dictionary)
+        {
+            foreach (var word in dictionary)
+            {
+                Insert(word.Key, word.Value);
+            }
+        }
+
+        public void ResetWordsDictionary(Dictionary<string, int> dictionary)
+        {
+            wordsDictionary = dictionary;
         }
 
         public Dictionary<string, int> GetAllWords()
@@ -64,6 +68,11 @@ namespace WordCompletion
                 return list.Take(max).ToList();
             }
             return list;
+        }
+
+        public void Clear()
+        {
+            wordsDictionary = new Dictionary<string, int>();
         }
     }
 }

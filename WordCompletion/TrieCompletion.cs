@@ -9,21 +9,23 @@ namespace WordCompletion
     {
         private Trie trie = new Trie();
 
-        public TrieCompletion()
+        public void Insert(string word, int usesCount = 1)
         {
+            trie.Insert(word, usesCount);
         }
 
-        public TrieCompletion(Dictionary<string, int> initialDictionary)
+        public void InsertWordsDictionary(Dictionary<string, int> dictionary)
         {
-            foreach(var word in initialDictionary)
+            foreach (var word in dictionary)
             {
                 trie.Insert(word.Key, word.Value);
             }
         }
 
-        public void Insert(string word, int usesCount = 1)
+        public void ResetWordsDictionary(Dictionary<string, int> dictionary)
         {
-            trie.Insert(word, usesCount);
+            trie = new Trie();
+            InsertWordsDictionary(dictionary);
         }
 
         public Dictionary<string, int> GetAllWords()
@@ -39,6 +41,11 @@ namespace WordCompletion
         public List<string> FindMostUsedMatches(string prefix, int max = 0)
         {
             return trie.FindMostUsedMatches(prefix, max);
+        }
+
+        public void Clear()
+        {
+            trie = new Trie();
         }
     }
 }
