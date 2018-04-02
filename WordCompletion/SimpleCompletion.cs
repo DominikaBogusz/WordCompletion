@@ -31,7 +31,8 @@ namespace WordCompletion
 
         public void ResetWordsDictionary(Dictionary<string, int> dictionary)
         {
-            wordsDictionary = dictionary;
+            wordsDictionary.Clear();
+            wordsDictionary = dictionary.ToDictionary(entry => entry.Key, entry => entry.Value);
         }
 
         public Dictionary<string, int> GetAllWords()
@@ -72,7 +73,7 @@ namespace WordCompletion
 
         public void Clear()
         {
-            wordsDictionary = new Dictionary<string, int>();
+            wordsDictionary.Clear();
         }
     }
 }
