@@ -76,23 +76,5 @@ namespace WordCompletion
             }
             return lastNode.GetWords();
         }
-
-        public List<string> FindMostUsedMatches(string prefix, int max = 0)
-        {
-            Dictionary<string, int> matches = FindMatches(prefix);
-            List<string> list = new List<string>();
-            if (matches.Any())
-            {
-                foreach (var item in matches.OrderByDescending(key => key.Value))
-                {
-                    list.Add(item.Key);
-                }
-            }
-            if (max > 0 && list.Count > max)
-            {
-                return list.Take(max).ToList();
-            }
-            return list;
-        }
     }
 }

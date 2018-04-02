@@ -10,8 +10,9 @@ namespace WordCompletion
         void InsertWordsDictionary(Dictionary<string, int> dictionary);
         void ResetWordsDictionary(Dictionary<string, int> dictionary);
         Dictionary<string, int> GetAllWords();
-        Dictionary<string, int> FindMatches(string prefix);
-        List<string> FindMostUsedMatches(string prefix, int max = 0);
+        Dictionary<string, int> FindAllMatches(string prefix);
+        Dictionary<string, int> FindMostUsedMatchesDictionary(string prefix, int max = 0);
+        List<string> FindMostUsedMatchesList(string prefix, int max = 0);
         void Clear();
     }
 }
