@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WordCompletion
 {
-    public class SimpleCompletion : IComplementarable
+    public class SimpleCompletion : Completion, IComplementarable
     {
         private Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
 
@@ -56,57 +56,13 @@ namespace WordCompletion
         public Dictionary<string, int> FindMostUsedMatchesDictionary(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = FindAllMatches(prefix);
-            Dictionary<string, int> dictionary = new Dictionary<string, int>();
-            if (matches.Any())
-            {
-                var orderedMatches = matches.OrderByDescending(key => key.Value);
-
-                if (max == 0)
-                {
-                    foreach (var pair in orderedMatches)
-                    {
-                        dictionary.Add(pair.Key, pair.Value);
-                    }
-                }
-                else
-                {
-                    int i = 0;
-                    while (i < max && i < orderedMatches.Count())
-                    {
-                        dictionary.Add(orderedMatches.ElementAt(i).Key, orderedMatches.ElementAt(i).Value);
-                        i++;
-                    }
-                }
-            }
-            return dictionary;
+            return GetOrderedMatchesDictionary(matches, max);
         }
 
         public List<string> FindMostUsedMatchesList(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = FindAllMatches(prefix);
-            List<string> list = new List<string>();
-            if (matches.Any())
-            {
-                var orderedMatches = matches.OrderByDescending(key => key.Value);
-
-                if(max == 0)
-                {
-                    foreach(var pair in orderedMatches)
-                    {
-                        list.Add(pair.Key);
-                    }
-                }
-                else
-                {
-                    int i = 0;
-                    while (i < max && i < orderedMatches.Count())
-                    {
-                        list.Add(orderedMatches.ElementAt(i).Key);
-                        i++;
-                    }
-                }
-            }
-            return list;
+            return GetOrderedMatchesList(matches, max);
         }
 
         public void Clear()
