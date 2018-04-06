@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace WordCompletion
@@ -32,42 +33,30 @@ namespace WordCompletion
             return trie.FindMatches("");
         }
 
-        public Dictionary<string, int> FindAllMatches(string prefix)
+        public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
-            return trie.FindMatches(prefix);
+            Dictionary<string, int> matches = trie.FindMatches(prefix);
+
+            if (max > 0 && max < matches.Count)
+            {
+                return matches.Take(max) as Dictionary<string, int>;
+            }
+            else
+            {
+                return matches;
+            }
         }
 
-        public Dictionary<string, int> FindMostUsedMatchesDictionary(string prefix, int max = 0)
+        public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = new Dictionary<string, int>();
-
-            var x = trie.FindMatchesHeap(prefix);
-
-            int iterMax = x.Size > max && max > 0 ? max : x.Size;
-
+            Heap heap = trie.FindMatchesHeap(prefix);
+            int iterMax = heap.Size > max && max > 0 ? max : heap.Size;
             for (int i = 0; i < iterMax; i++)
             {
-                var y = x.PopMin();
+                var y = heap.PopMin();
                 matches.Add(y.Word, y.SearchCount);
             }
-
-            return matches;
-        }
-
-        public List<string> FindMostUsedMatchesList(string prefix, int max = 0)
-        {
-            List<string> matches = new List<string>();
-
-            var x = trie.FindMatchesHeap(prefix);
-
-            int iterMax = x.Size > max && max > 0 ? max : x.Size;
-
-            for (int i = 0; i < iterMax; i++)
-            {
-                var y = x.PopMin();
-                matches.Add(y.Word);
-            }
-
             return matches;
         }
 

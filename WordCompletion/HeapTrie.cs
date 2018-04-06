@@ -13,7 +13,6 @@ namespace WordCompletion
             root = new HeapTrieNode(' ');
         }
 
-
         public void Insert(string word, int usesCount = 1)
         {
             if (!Search(word))
@@ -77,7 +76,6 @@ namespace WordCompletion
             }
             return lastNode.GetWordsHeap();
         }
-
 
         public Dictionary<string, int> FindMatches(string prefix)
         {

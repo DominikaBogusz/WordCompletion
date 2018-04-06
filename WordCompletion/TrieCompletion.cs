@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WordCompletion
 {
-    public class TrieCompletion : Completion, IComplementarable
+    public class TrieCompletion : IComplementarable
     {
         private Trie trie = new Trie();
 
@@ -33,21 +33,34 @@ namespace WordCompletion
             return trie.FindMatches("");
         }
 
-        public Dictionary<string, int> FindAllMatches(string prefix)
-        {
-            return trie.FindMatches(prefix);
-        }
-
-        public Dictionary<string, int> FindMostUsedMatchesDictionary(string prefix, int max = 0)
+        public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = trie.FindMatches(prefix);
-            return GetOrderedMatchesDictionary(matches, max);
+            if(max > 0 && max < matches.Count)
+            {
+                return matches.Take(max) as Dictionary<string, int>;
+            }
+            else
+            {
+                return matches;
+            }
         }
 
-        public List<string> FindMostUsedMatchesList(string prefix, int max = 0)
+        public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
         {
+            Dictionary<string, int> output = new Dictionary<string, int>();
             Dictionary<string, int> matches = trie.FindMatches(prefix);
-            return GetOrderedMatchesList(matches, max);
+            if (matches.Any())
+            {
+                var orderedMatches = matches.OrderByDescending(key => key.Value);
+                int iterMax = orderedMatches.Count() > max && max > 0 ? max : orderedMatches.Count();
+                for (int i = 0; i < iterMax; i++)
+                {
+                    var element = orderedMatches.ElementAt(i);
+                    output.Add(element.Key, element.Value);
+                }
+            }
+            return output;
         }
 
         public void Clear()

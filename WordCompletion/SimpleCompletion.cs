@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WordCompletion
 {
-    public class SimpleCompletion : Completion, IComplementarable
+    public class SimpleCompletion : IComplementarable
     {
         private Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
 
@@ -40,7 +40,7 @@ namespace WordCompletion
             return wordsDictionary;
         }
 
-        public Dictionary<string, int> FindAllMatches(string prefix)
+        public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = new Dictionary<string, int>();
             foreach(var word in wordsDictionary)
@@ -53,16 +53,21 @@ namespace WordCompletion
             return matches;
         }
 
-        public Dictionary<string, int> FindMostUsedMatchesDictionary(string prefix, int max = 0)
+        public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
         {
-            Dictionary<string, int> matches = FindAllMatches(prefix);
-            return GetOrderedMatchesDictionary(matches, max);
-        }
-
-        public List<string> FindMostUsedMatchesList(string prefix, int max = 0)
-        {
-            Dictionary<string, int> matches = FindAllMatches(prefix);
-            return GetOrderedMatchesList(matches, max);
+            Dictionary<string, int> output = new Dictionary<string, int>();
+            Dictionary<string, int> matches = FindMatches(prefix);
+            if (matches.Any())
+            {
+                var orderedMatches = matches.OrderByDescending(key => key.Value);
+                int iterMax = orderedMatches.Count() > max && max > 0 ? max : orderedMatches.Count();
+                for (int i = 0; i < iterMax; i++)
+                {
+                    var element = orderedMatches.ElementAt(i);
+                    output.Add(element.Key, element.Value);
+                }
+            }
+            return output;
         }
 
         public void Clear()
