@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WordCompletion
 {
-    class Trie
+    public class Trie
     {
         private TrieNode root;
 

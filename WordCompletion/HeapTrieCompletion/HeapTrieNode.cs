@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace WordCompletion
 {
-    class TrieNode
+    public class HeapTrieNode
     {
         private char character;
-        public LinkedList<TrieNode> Children { get; set; }
-        public TrieNode Parent { get; set; }
+        public LinkedList<HeapTrieNode> Children { get; set; }
+        public HeapTrieNode Parent { get; set; }
         public bool IsEnd { get; set; }
         public int SearchCount { get; set; }
 
-        public TrieNode(char x)
+        public HeapTrieNode(char x)
         {
             character = x;
-            Children = new LinkedList<TrieNode>();
+            Children = new LinkedList<HeapTrieNode>();
             IsEnd = false;
             SearchCount = 0;
         }
 
-        public TrieNode GetChild(char x)
+        public HeapTrieNode GetChild(char x)
         {
             if (Children.Any())
             {
-                foreach (TrieNode child in Children)
+                foreach (HeapTrieNode child in Children)
                 {
                     if (child.character == x)
                     {
@@ -46,7 +47,7 @@ namespace WordCompletion
             {
                 for (int i = 0; i < Children.Count; i++)
                 {
-                    TrieNode currentChild = Children.ElementAt(i);
+                    HeapTrieNode currentChild = Children.ElementAt(i);
                     if (currentChild != null)
                     {
                         foreach (var item in currentChild.GetWords())
@@ -57,6 +58,31 @@ namespace WordCompletion
                 }
             }
             return dictionary;
+        }
+
+        public Heap GetWordsHeap()
+        {
+            Heap heap = new Heap();
+            if (IsEnd)
+            {
+                heap.Add(new HeapNode(ToWord(), SearchCount));
+            }
+            if (Children.Any())
+            {
+                for (int i = 0; i < Children.Count; i++)
+                {
+                    HeapTrieNode currentChild = Children.ElementAt(i);
+                    if (currentChild != null)
+                    {
+                        var childHeap = currentChild.GetWordsHeap();
+                        for (int j = 0; j < childHeap.Size; j++)
+                        {
+                            heap.Add(childHeap.Nodes.ElementAt(j));
+                        }
+                    }
+                }
+            }
+            return heap;
         }
 
         public string ToWord()
