@@ -21,7 +21,7 @@ namespace WordCompletion
             }
         }
 
-        public void InsertWordsDictionary(Dictionary<string, int> dictionary)
+        public void InsertWords(Dictionary<string, int> dictionary)
         {
             foreach (var word in dictionary)
             {
@@ -29,10 +29,15 @@ namespace WordCompletion
             }
         }
 
-        public void ResetWordsDictionary(Dictionary<string, int> dictionary)
+        public void ResetWords(Dictionary<string, int> dictionary)
         {
             wordsDictionary.Clear();
             wordsDictionary = dictionary.ToDictionary(entry => entry.Key, entry => entry.Value);
+        }
+
+        public void UsePLVocabulary(bool enable)
+        {
+            //TODO
         }
 
         public Dictionary<string, int> GetAllWords()

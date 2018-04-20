@@ -14,7 +14,7 @@ namespace WordCompletion
             trie.Insert(word, usesCount);
         }
 
-        public void InsertWordsDictionary(Dictionary<string, int> dictionary)
+        public void InsertWords(Dictionary<string, int> dictionary)
         {
             foreach (var word in dictionary)
             {
@@ -22,10 +22,15 @@ namespace WordCompletion
             }
         }
 
-        public void ResetWordsDictionary(Dictionary<string, int> dictionary)
+        public void ResetWords(Dictionary<string, int> dictionary)
         {
             trie = new Trie();
-            InsertWordsDictionary(dictionary);
+            InsertWords(dictionary);
+        }
+
+        public void UsePLVocabulary(bool enable)
+        {
+            //TODO
         }
 
         public Dictionary<string, int> GetAllWords()
