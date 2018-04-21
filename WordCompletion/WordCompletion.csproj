@@ -67,6 +67,7 @@
     <Compile Include="TrieCompletion\Trie.cs" />
     <Compile Include="TrieCompletion\TrieCompletion.cs" />
     <Compile Include="TrieCompletion\TrieNode.cs" />
+    <Compile Include="VocabularyFromTxt.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\VocabularyPL.txt" />

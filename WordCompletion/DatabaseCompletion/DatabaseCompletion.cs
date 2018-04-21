@@ -12,15 +12,15 @@ namespace WordCompletion
     public class DatabaseCompletion : IComplementarable
     {
         SqlConnection cnn;
-        string databasePath = @"data\WordsDatabase.mdf";
-        bool usePLVocabulary;
+        string databasePath = @"\data\WordsDatabase.mdf";
+        bool usingPLVocabulary;
 
         public DatabaseCompletion(bool usePLVocabulary)
         {
             cnn = GetConnection();
             cnn.Open();
 
-            this.usePLVocabulary = usePLVocabulary;
+            usingPLVocabulary = usePLVocabulary;
         }
 
         private SqlConnection GetConnection()
@@ -62,7 +62,7 @@ namespace WordCompletion
 
         public void UsePLVocabulary(bool enable)
         {
-            usePLVocabulary = enable;
+            usingPLVocabulary = enable;
         }
 
         public Dictionary<string, int> GetAllWords()
@@ -95,7 +95,7 @@ namespace WordCompletion
             {
                 selectQuery += "TOP(" + max + ") ";
             }
-            if (usePLVocabulary)
+            if (usingPLVocabulary)
             {
                 selectQuery +=
                     "W.Word, SUM(W.UsesCount) as UsesSum " +
@@ -134,7 +134,7 @@ namespace WordCompletion
             {
                 selectQuery += "TOP(" + max + ") ";
             }
-            if (usePLVocabulary)
+            if (usingPLVocabulary)
             {
                 selectQuery +=
                     "W.Word, SUM(W.UsesCount) as UsesSum " +
