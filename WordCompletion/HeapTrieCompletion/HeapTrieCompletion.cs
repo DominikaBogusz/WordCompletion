@@ -7,56 +7,72 @@ namespace WordCompletion
 {
     public class HeapTrieCompletion : IComplementarable
     {
-        private HeapTrie trie = new HeapTrie();
-        Dictionary<string, int> wordsFromPLVocabulary = new Dictionary<string, int>();
-        bool usingPLVocabulary;
-
-        public HeapTrieCompletion(bool usePLVocabulary)
-        {
-            UsePLVocabulary(usePLVocabulary);
-        }
+        private HeapTrie userWords = new HeapTrie();
+        private HeapTrie vocabularyWords = new HeapTrie();
+        private bool sortingByUsesCount = true;
+        private bool usingPLVocabulary = false;
 
         public void Insert(string word, int usesCount = 1)
         {
-            trie.Insert(word, usesCount);
+            userWords.Insert(word, usesCount);
         }
 
         public void InsertWords(Dictionary<string, int> dictionary)
         {
             foreach (var word in dictionary)
             {
-                trie.Insert(word.Key, word.Value);
+                userWords.Insert(word.Key, word.Value);
             }
         }
 
         public void ResetWords(Dictionary<string, int> dictionary)
         {
-            trie = new HeapTrie();
+            userWords = new HeapTrie();
             InsertWords(dictionary);
+        }
+
+        public void SortByUsesCount(bool enable)
+        {
+            sortingByUsesCount = enable;
         }
 
         public void UsePLVocabulary(bool enable)
         {
             if (enable)
             {
-                wordsFromPLVocabulary = new VocabularyFromTxt().GetVocabulary();
+                foreach (var word in new VocabularyFromTxt().GetVocabulary())
+                {
+                    vocabularyWords.Insert(word.Key, word.Value);
+                }
             }
             else
             {
-                wordsFromPLVocabulary.Clear();
+                vocabularyWords = new HeapTrie();
             }
 
             usingPLVocabulary = enable;
         }
 
-        public Dictionary<string, int> GetAllWords()
+        public Dictionary<string, int> GetAllUserWords()
         {
-            return trie.FindMatches("");
+            return userWords.FindMatches("");
         }
 
         public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
-            Dictionary<string, int> matches = trie.FindMatches(prefix);
+            if (sortingByUsesCount)
+            {
+                return FindMostUsedMatches(prefix, max);
+            }
+            else
+            {
+                return FindUnorderedMatches(prefix, max);
+            }
+        }
+
+        public Dictionary<string, int> FindUnorderedMatches(string prefix, int max = 0)
+        {
+            Dictionary<string, int> matches = userWords.FindMatches(prefix);
             if (max > 0)
             {
                 if (matches.Count > max)
@@ -66,13 +82,11 @@ namespace WordCompletion
                 if (usingPLVocabulary)
                 {
                     int i = 0;
-                    while (matches.Count < max && i < wordsFromPLVocabulary.Count)
+                    Dictionary<string, int> vocabularyMatches = vocabularyWords.FindMatches(prefix);
+                    while (matches.Count < max && i < vocabularyMatches.Count)
                     {
-                        var element = wordsFromPLVocabulary.ElementAt(i);
-                        if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
-                        {
-                            matches.Add(element.Key, element.Value);
-                        }
+                        var element = vocabularyMatches.ElementAt(i);
+                        matches.Add(element.Key, element.Value);
                         i++;
                     }
                 }
@@ -82,12 +96,9 @@ namespace WordCompletion
             {
                 if (usingPLVocabulary)
                 {
-                    foreach (var element in wordsFromPLVocabulary)
+                    foreach (var element in vocabularyWords.FindMatches(prefix))
                     {
-                        if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
-                        {
-                            matches.Add(element.Key, element.Value);
-                        }
+                        matches.Add(element.Key, element.Value);
                     }
                 }
                 return matches;
@@ -97,7 +108,7 @@ namespace WordCompletion
         public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = new Dictionary<string, int>();
-            Heap heap = trie.FindMatchesHeap(prefix);
+            Heap heap = userWords.FindMatchesHeap(prefix);
             int iterMax = heap.Size > max && max > 0 ? max : heap.Size;
             for (int i = 0; i < iterMax; i++)
             {
@@ -109,7 +120,7 @@ namespace WordCompletion
 
         public void Clear()
         {
-            trie = new HeapTrie();
+            userWords = new HeapTrie();
         }
     }
 }

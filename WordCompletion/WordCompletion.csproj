@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompletionManager.cs" />
     <Compile Include="DatabaseCompletion\DatabaseCompletion.cs" />
     <Compile Include="HeapTrieCompletion\Heap.cs" />
     <Compile Include="HeapTrieCompletion\HeapNode.cs" />

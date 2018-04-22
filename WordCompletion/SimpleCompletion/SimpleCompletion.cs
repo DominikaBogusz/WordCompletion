@@ -7,24 +7,20 @@ namespace WordCompletion
 {
     public class SimpleCompletion : IComplementarable
     {
-        private Dictionary<string, int> wordsDictionary = new Dictionary<string, int>();
-        Dictionary<string, int> wordsFromPLVocabulary = new Dictionary<string, int>();
-        bool usingPLVocabulary;
-
-        public SimpleCompletion(bool usePLVocabulary)
-        {
-            UsePLVocabulary(usePLVocabulary);
-        }
+        private Dictionary<string, int> userWords = new Dictionary<string, int>();
+        private Dictionary<string, int> vocabularyWords = new Dictionary<string, int>();
+        private bool sortingByUsesCount = true;
+        private bool usingPLVocabulary = false;
 
         public void Insert(string word, int usesCount = 1)
         {
-            if (wordsDictionary.ContainsKey(word))
+            if (userWords.ContainsKey(word))
             {
-                wordsDictionary[word] += usesCount;
+                userWords[word] += usesCount;
             }
             else
             {
-                wordsDictionary.Add(word, usesCount);
+                userWords.Add(word, usesCount);
             }
         }
 
@@ -38,33 +34,50 @@ namespace WordCompletion
 
         public void ResetWords(Dictionary<string, int> dictionary)
         {
-            wordsDictionary.Clear();
-            wordsDictionary = dictionary.ToDictionary(entry => entry.Key, entry => entry.Value);
+            userWords.Clear();
+            userWords = dictionary.ToDictionary(entry => entry.Key, entry => entry.Value);
+        }
+
+        public void SortByUsesCount(bool enable)
+        {
+            sortingByUsesCount = enable;
         }
 
         public void UsePLVocabulary(bool enable)
         {
             if (enable)
             {
-                wordsFromPLVocabulary = new VocabularyFromTxt().GetVocabulary();
+                vocabularyWords = new VocabularyFromTxt().GetVocabulary();
             }
             else
             {
-                wordsFromPLVocabulary.Clear();
+                vocabularyWords.Clear();
             }
 
             usingPLVocabulary = enable;
         }
 
-        public Dictionary<string, int> GetAllWords()
+        public Dictionary<string, int> GetAllUserWords()
         {
-            return wordsDictionary;
+            return userWords;
         }
 
         public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
+            if (sortingByUsesCount)
+            {
+                return FindMostUsedMatches(prefix, max);
+            }
+            else
+            {
+                return FindUnorderedMatches(prefix, max);
+            }
+        }
+
+        public Dictionary<string, int> FindUnorderedMatches(string prefix, int max = 0)
+        {
             Dictionary<string, int> matches = new Dictionary<string, int>();
-            foreach (var word in wordsDictionary)
+            foreach (var word in userWords)
             {
                 if (word.Key.StartsWith(prefix))
                 {
@@ -80,9 +93,9 @@ namespace WordCompletion
                 if(usingPLVocabulary)
                 {
                     int i = 0;
-                    while (matches.Count < max && i < wordsFromPLVocabulary.Count)
+                    while (matches.Count < max && i < vocabularyWords.Count)
                     {
-                        var element = wordsFromPLVocabulary.ElementAt(i);
+                        var element = vocabularyWords.ElementAt(i);
                         if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
                         {
                             matches.Add(element.Key, element.Value);
@@ -96,7 +109,7 @@ namespace WordCompletion
             {
                 if (usingPLVocabulary)
                 {
-                    foreach(var element in wordsFromPLVocabulary)
+                    foreach(var element in vocabularyWords)
                     {
                         if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
                         {
@@ -127,7 +140,7 @@ namespace WordCompletion
 
         public void Clear()
         {
-            wordsDictionary.Clear();
+            userWords.Clear();
         }
     }
 }

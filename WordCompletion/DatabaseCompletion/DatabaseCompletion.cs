@@ -11,16 +11,15 @@ namespace WordCompletion
 {
     public class DatabaseCompletion : IComplementarable
     {
-        SqlConnection cnn;
-        string databasePath = @"\data\WordsDatabase.mdf";
-        bool usingPLVocabulary;
+        private SqlConnection cnn;
+        private string databasePath = @"\data\WordsDatabase.mdf";
+        private bool sortingByUsesCount = true;
+        private bool usingPLVocabulary = false;
 
-        public DatabaseCompletion(bool usePLVocabulary)
+        public DatabaseCompletion()
         {
             cnn = GetConnection();
             cnn.Open();
-
-            UsePLVocabulary(usePLVocabulary);
         }
 
         private SqlConnection GetConnection()
@@ -60,12 +59,17 @@ namespace WordCompletion
             }
         }
 
+        public void SortByUsesCount(bool enable)
+        {
+            sortingByUsesCount = enable;
+        }
+
         public void UsePLVocabulary(bool enable)
         {
             usingPLVocabulary = enable;
         }
 
-        public Dictionary<string, int> GetAllWords()
+        public Dictionary<string, int> GetAllUserWords()
         {
             SqlCommand cmdSelect = new SqlCommand("SELECT * FROM UserWords", cnn);
             SqlDataReader dataReader = cmdSelect.ExecuteReader();
@@ -89,6 +93,18 @@ namespace WordCompletion
         }
 
         public Dictionary<string, int> FindMatches(string prefix, int max = 0)
+        {
+            if (sortingByUsesCount)
+            {
+                return FindMostUsedMatches(prefix, max);
+            }
+            else
+            {
+                return FindUnorderedMatches(prefix, max);
+            }
+        }
+
+        public Dictionary<string, int> FindUnorderedMatches(string prefix, int max = 0)
         {
             string selectQuery = "SELECT ";
             if (max > 0)
