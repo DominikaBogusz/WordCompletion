@@ -20,7 +20,7 @@ namespace WordCompletion
             cnn = GetConnection();
             cnn.Open();
 
-            usingPLVocabulary = usePLVocabulary;
+            UsePLVocabulary(usePLVocabulary);
         }
 
         private SqlConnection GetConnection()

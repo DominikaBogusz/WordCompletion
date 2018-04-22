@@ -13,7 +13,7 @@ namespace WordCompletion
 
         public SimpleCompletion(bool usePLVocabulary)
         {
-            usingPLVocabulary = usePLVocabulary;
+            UsePLVocabulary(usePLVocabulary);
         }
 
         public void Insert(string word, int usesCount = 1)

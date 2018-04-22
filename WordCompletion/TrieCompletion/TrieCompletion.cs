@@ -8,6 +8,13 @@ namespace WordCompletion
     public class TrieCompletion : IComplementarable
     {
         private Trie trie = new Trie();
+        Dictionary<string, int> wordsFromPLVocabulary = new Dictionary<string, int>();
+        bool usingPLVocabulary;
+
+        public TrieCompletion(bool usePLVocabulary)
+        {
+            UsePLVocabulary(usePLVocabulary);
+        }
 
         public void Insert(string word, int usesCount = 1)
         {
@@ -30,7 +37,16 @@ namespace WordCompletion
 
         public void UsePLVocabulary(bool enable)
         {
-            //TODO
+            if (enable)
+            {
+                wordsFromPLVocabulary = new VocabularyFromTxt().GetVocabulary();
+            }
+            else
+            {
+                wordsFromPLVocabulary.Clear();
+            }
+
+            usingPLVocabulary = enable;
         }
 
         public Dictionary<string, int> GetAllWords()
@@ -41,12 +57,39 @@ namespace WordCompletion
         public Dictionary<string, int> FindMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> matches = trie.FindMatches(prefix);
-            if(max > 0 && max < matches.Count)
+            if (max > 0)
             {
-                return matches.Take(max) as Dictionary<string, int>;
+                if (matches.Count > max)
+                {
+                    return matches.Take(max) as Dictionary<string, int>;
+                }
+                if (usingPLVocabulary)
+                {
+                    int i = 0;
+                    while (matches.Count < max && i < wordsFromPLVocabulary.Count)
+                    {
+                        var element = wordsFromPLVocabulary.ElementAt(i);
+                        if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
+                        {
+                            matches.Add(element.Key, element.Value);
+                        }
+                        i++;
+                    }
+                }
+                return matches;
             }
             else
             {
+                if (usingPLVocabulary)
+                {
+                    foreach (var element in wordsFromPLVocabulary)
+                    {
+                        if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
+                        {
+                            matches.Add(element.Key, element.Value);
+                        }
+                    }
+                }
                 return matches;
             }
         }
