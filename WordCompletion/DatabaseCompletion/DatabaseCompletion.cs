@@ -12,21 +12,15 @@ namespace WordCompletion
     public class DatabaseCompletion : IComplementarable
     {
         private SqlConnection cnn;
-        private string databasePath = @"\data\WordsDatabase.mdf";
+
         private bool sortingByUsesCount = true;
         private bool usingPLVocabulary = false;
 
-        public DatabaseCompletion()
+        public DatabaseCompletion(string databasePath)
         {
-            cnn = GetConnection();
+            string connetionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + databasePath + @";Integrated Security=True";
+            cnn = new SqlConnection(connetionString);
             cnn.Open();
-        }
-
-        private SqlConnection GetConnection()
-        {
-            string directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string connetionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + directory + databasePath + @";Integrated Security=True";
-            return new SqlConnection(connetionString);
         }
 
         public void Insert(string word, int usesCount = 1)

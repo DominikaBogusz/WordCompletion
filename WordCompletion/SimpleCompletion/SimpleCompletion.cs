@@ -9,8 +9,14 @@ namespace WordCompletion
     {
         private Dictionary<string, int> userWords = new Dictionary<string, int>();
         private Dictionary<string, int> vocabularyWords = new Dictionary<string, int>();
+        private string vocabularyFile;
         private bool sortingByUsesCount = true;
         private bool usingPLVocabulary = false;
+
+        public SimpleCompletion(string vocabularyFilePath)
+        {
+            vocabularyFile = vocabularyFilePath;
+        }
 
         public void Insert(string word, int usesCount = 1)
         {
@@ -47,7 +53,7 @@ namespace WordCompletion
         {
             if (enable)
             {
-                vocabularyWords = new VocabularyFromTxt().GetVocabulary();
+                vocabularyWords = new VocabularyFromTxt(vocabularyFile).GetVocabulary();
             }
             else
             {
@@ -109,7 +115,7 @@ namespace WordCompletion
             {
                 if (usingPLVocabulary)
                 {
-                    foreach(var element in vocabularyWords)
+                    foreach (var element in vocabularyWords)
                     {
                         if (element.Key.StartsWith(prefix) && !matches.ContainsKey(element.Key))
                         {
@@ -124,7 +130,7 @@ namespace WordCompletion
         public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
         {
             Dictionary<string, int> output = new Dictionary<string, int>();
-            Dictionary<string, int> matches = FindMatches(prefix);
+            Dictionary<string, int> matches = FindUnorderedMatches(prefix);
             if (matches.Any())
             {
                 var orderedMatches = matches.OrderByDescending(key => key.Value);

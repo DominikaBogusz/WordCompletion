@@ -12,9 +12,9 @@ namespace WordCompletion
     {
         string vocabularyFile;
 
-        public VocabularyFromTxt()
+        public VocabularyFromTxt(string vocabularyFilePath)
         {
-            vocabularyFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\data\VocabularyPL.txt";
+            vocabularyFile = vocabularyFilePath;
         }
 
         public Dictionary<string, int> GetVocabulary()

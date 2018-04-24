@@ -45,5 +45,10 @@ namespace WordCompletion
         {
             return completion.GetAllUserWords();
         }
+
+        public void ResetUserWords(Dictionary<string, int> words)
+        {
+            completion.ResetWords(words);
+        }
     }
 }

@@ -9,8 +9,14 @@ namespace WordCompletion
     {
         private HeapTrie userWords = new HeapTrie();
         private HeapTrie vocabularyWords = new HeapTrie();
+        private string vocabularyFile;
         private bool sortingByUsesCount = true;
         private bool usingPLVocabulary = false;
+
+        public HeapTrieCompletion(string vocabularyFilePath)
+        {
+            vocabularyFile = vocabularyFilePath;
+        }
 
         public void Insert(string word, int usesCount = 1)
         {
@@ -40,7 +46,7 @@ namespace WordCompletion
         {
             if (enable)
             {
-                foreach (var word in new VocabularyFromTxt().GetVocabulary())
+                foreach (var word in new VocabularyFromTxt(vocabularyFile).GetVocabulary())
                 {
                     vocabularyWords.Insert(word.Key, word.Value);
                 }
@@ -86,7 +92,10 @@ namespace WordCompletion
                     while (matches.Count < max && i < vocabularyMatches.Count)
                     {
                         var element = vocabularyMatches.ElementAt(i);
-                        matches.Add(element.Key, element.Value);
+                        if (!matches.ContainsKey(element.Key))
+                        {
+                            matches.Add(element.Key, element.Value);
+                        }
                         i++;
                     }
                 }
@@ -98,7 +107,10 @@ namespace WordCompletion
                 {
                     foreach (var element in vocabularyWords.FindMatches(prefix))
                     {
-                        matches.Add(element.Key, element.Value);
+                        if (!matches.ContainsKey(element.Key))
+                        {
+                            matches.Add(element.Key, element.Value);
+                        }
                     }
                 }
                 return matches;
