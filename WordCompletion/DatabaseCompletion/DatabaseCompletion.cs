@@ -13,14 +13,15 @@ namespace WordCompletion
     {
         private SqlConnection cnn;
 
-        private bool sortingByUsesCount = true;
-        private bool usingPLVocabulary = false;
+        private bool usingPLVocabulary;
 
-        public DatabaseCompletion(string databasePath)
+        public DatabaseCompletion(string databasePath, bool sortByUsesCount, bool usePLVocabulary)
         {
             string connetionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + databasePath + @";Integrated Security=True";
             cnn = new SqlConnection(connetionString);
             cnn.Open();
+
+            UsePLVocabulary(usePLVocabulary);
         }
 
         public void Insert(string word, int usesCount = 1)
@@ -53,17 +54,12 @@ namespace WordCompletion
             }
         }
 
-        public void SortByUsesCount(bool enable)
-        {
-            sortingByUsesCount = enable;
-        }
-
         public void UsePLVocabulary(bool enable)
         {
             usingPLVocabulary = enable;
         }
 
-        public Dictionary<string, int> GetAllUserWords()
+        public Dictionary<string, int> GetAllWords()
         {
             SqlCommand cmdSelect = new SqlCommand("SELECT * FROM UserWords", cnn);
             SqlDataReader dataReader = cmdSelect.ExecuteReader();
@@ -86,19 +82,7 @@ namespace WordCompletion
             return dictionary;
         }
 
-        public Dictionary<string, int> FindMatches(string prefix, int max = 0)
-        {
-            if (sortingByUsesCount)
-            {
-                return FindMostUsedMatches(prefix, max);
-            }
-            else
-            {
-                return FindUnorderedMatches(prefix, max);
-            }
-        }
-
-        public Dictionary<string, int> FindUnorderedMatches(string prefix, int max = 0)
+        public Dictionary<string, int> FindMatches(string prefix, bool sortByUsesCount, int max = 0)
         {
             string selectQuery = "SELECT ";
             if (max > 0)
@@ -108,59 +92,23 @@ namespace WordCompletion
             if (usingPLVocabulary)
             {
                 selectQuery +=
-                    "W.Word, SUM(W.UsesCount) as UsesSum " +
+                    "W.Word as Word, SUM(W.UsesCount) as UsesCount " +
                     "FROM ( " +
                             "(SELECT * FROM UserWords " +
                             "WHERE UserWords.Word LIKE '" + prefix + "%') " +
                             "UNION ALL " +
-                            "(SELECT * FROM Words " +
-                            "WHERE Words.Word LIKE '" + prefix + "%') " +
+                            "(SELECT * FROM VocabularyWords " +
+                            "WHERE VocabularyWords.Word LIKE '" + prefix + "%') " +
                         ") AS W " +
-                    "GROUP BY W.Word";
+                    "GROUP BY Word ";
             }
             else
             {
-                selectQuery += "* FROM UserWords WHERE Word LIKE '" + prefix + "%'";
+                selectQuery += "Word, UsesCount FROM UserWords WHERE Word LIKE '" + prefix + "%' ";
             }
-
-            SqlCommand cmdSelect = new SqlCommand(selectQuery, cnn);
-            SqlDataReader dataReader = cmdSelect.ExecuteReader();
-
-            Dictionary<string, int> dictionary = new Dictionary<string, int>();
-            while (dataReader.Read())
+            if (sortByUsesCount)
             {
-                string word = dataReader["Word"].ToString();
-                int count = Int32.Parse(dataReader["UsesCount"].ToString());
-
-                dictionary.Add(word, count);
-            }
-            return dictionary;
-        }
-
-        public Dictionary<string, int> FindMostUsedMatches(string prefix, int max = 0)
-        {
-            string selectQuery = "SELECT ";
-            if(max > 0)
-            {
-                selectQuery += "TOP(" + max + ") ";
-            }
-            if (usingPLVocabulary)
-            {
-                selectQuery +=
-                    "W.Word, SUM(W.UsesCount) as UsesSum " +
-                    "FROM ( " +
-                            "(SELECT * FROM UserWords " +
-                            "WHERE UserWords.Word LIKE '" + prefix + "%') " +
-                            "UNION ALL " +
-                            "(SELECT * FROM Words " +
-                            "WHERE Words.Word LIKE '" + prefix + "%') " +
-                        ") AS W " +
-                    "GROUP BY W.Word" +
-                    "ORDER BY UsesSum DESC";
-            }
-            else
-            {
-                selectQuery += "* FROM UserWords WHERE Word LIKE '" + prefix + "%' ORDER BY UsesCount DESC";
+                selectQuery += "ORDER BY UsesCount DESC";
             }
 
             SqlCommand cmdSelect = new SqlCommand(selectQuery, cnn);
@@ -182,5 +130,6 @@ namespace WordCompletion
             SqlCommand cmdDelete = new SqlCommand("DELETE FROM UserWords", cnn);
             cmdDelete.ExecuteNonQuery();
         }
+
     }
 }

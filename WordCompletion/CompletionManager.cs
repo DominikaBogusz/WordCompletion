@@ -10,25 +10,22 @@ namespace WordCompletion
     {
         private IComplementarable completion;
 
-        public CompletionManager(IComplementarable completionSource, Dictionary<string, int> initialWords = null, bool sortByUsesCount = true, bool useVocabulary = false)
+        private bool sortingByUsesCount;
+
+        public CompletionManager(IComplementarable completionSource, Dictionary<string, int> initialWords = null, bool sortByUsesCount = true)
         {
             completion = completionSource;
             if (initialWords != null)
             {
                 completion.InsertWords(initialWords);
             }
-            completion.SortByUsesCount(sortByUsesCount);
-            completion.UsePLVocabulary(useVocabulary);
+
+            sortingByUsesCount = sortByUsesCount;
         }
 
         public void SortByUsesCount(bool enable)
         {
-            completion.SortByUsesCount(enable);
-        }
-
-        public void UsePLVocabulary(bool enable)
-        {
-            completion.UsePLVocabulary(enable);
+            sortingByUsesCount = enable;
         }
 
         public void InsertWord(string word)
@@ -38,17 +35,22 @@ namespace WordCompletion
 
         public Dictionary<string, int> GetMatches(string prefix, int max = 0)
         {
-            return completion.FindMatches(prefix, max);
+            return completion.FindMatches(prefix, sortingByUsesCount, max);
         }
 
-        public Dictionary<string, int> GetAllUserWords()
+        public Dictionary<string, int> GetAllWords()
         {
-            return completion.GetAllUserWords();
+            return completion.GetAllWords();
         }
 
         public void ResetUserWords(Dictionary<string, int> words)
         {
             completion.ResetWords(words);
+        }
+
+        public void ClearWords()
+        {
+            completion.Clear();
         }
     }
 }
